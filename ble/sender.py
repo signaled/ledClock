@@ -66,8 +66,17 @@ class DisplaySender:
             self._address, disconnected_callback=self._on_disconnect
         )
         await self._client.connect()
-        # MTU 크기 확인
-        self._mtu_size = self._client.mtu_size - 3  # ATT 헤더 제외
+        # MTU 크기 확인 — characteristic의 max_write_without_response_size 사용 (크로스플랫폼)
+        try:
+            char = self._client.services.get_characteristic(WRITE_UUID)
+            if char and char.max_write_without_response_size > 20:
+                self._mtu_size = char.max_write_without_response_size
+            else:
+                self._mtu_size = self._client.mtu_size - 3
+        except Exception:
+            self._mtu_size = self._client.mtu_size - 3
+        if self._mtu_size < 20:
+            self._mtu_size = 20
         logger.info("BLE 연결 성공: %s (MTU write size: %d)", self._address, self._mtu_size)
         await self._client.start_notify(NOTIFY_UUID, self._on_notify)
         self._connected = True
