@@ -28,8 +28,8 @@ class Layout:
         overlays.append((date, (date_x, 18)))
 
         # 날씨 아이콘: 오른쪽 하단
-        icon_x = SCREEN_W - weather_icon.width + 4
-        icon_y = SCREEN_H - weather_icon.height + 8
+        icon_x = SCREEN_W - weather_icon.width + 2
+        icon_y = SCREEN_H - weather_icon.height + 3
         overlays.append((weather_icon, (icon_x, icon_y)))
 
         # 온도: 오른쪽 하단에 붙여서

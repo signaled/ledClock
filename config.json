@@ -5,6 +5,7 @@
   },
   "display": {
     "brightness": 50,
+    "fps": 1,
     "orientation": 0
   },
   "clock": {

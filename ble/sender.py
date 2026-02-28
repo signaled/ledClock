@@ -198,7 +198,17 @@ class DisplaySender:
 
             payloads = self._build_image_payloads(png_bytes)
             logger.info("이미지 전송: %d 바이트, %d 청크", len(png_bytes), len(payloads))
-            return await self._send_payloads(payloads)
+
+            self._final_ack.clear()
+            result = await self._send_payloads(payloads)
+
+            # 디바이스가 프레임을 처리할 때까지 대기 (큐 밀림 방지)
+            try:
+                await asyncio.wait_for(self._final_ack.wait(), timeout=1.0)
+            except asyncio.TimeoutError:
+                pass
+
+            return result
         except Exception as e:
             logger.error("이미지 전송 실패: %s", e)
             self._connected = False

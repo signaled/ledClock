@@ -10,6 +10,10 @@ ICON_SIZE = 38
 _FONT_PATH = Path(__file__).parent.parent / "assets" / "fonts" / "MaterialSymbols.ttf"
 _font: ImageFont.FreeTypeFont | None = None
 
+# Bootstrap Icons 폰트
+_BI_FONT_PATH = Path(__file__).parent.parent / "assets" / "fonts" / "bootstrap-icons.woff"
+_bi_font: ImageFont.FreeTypeFont | None = None
+
 
 def _get_font() -> ImageFont.FreeTypeFont:
     global _font
@@ -18,14 +22,25 @@ def _get_font() -> ImageFont.FreeTypeFont:
     return _font
 
 
+def _get_bi_font() -> ImageFont.FreeTypeFont:
+    global _bi_font
+    if _bi_font is None:
+        _bi_font = ImageFont.truetype(str(_BI_FONT_PATH), ICON_SIZE)
+    return _bi_font
+
+
 # Material Symbols 코드포인트
 _ICON_CHARS = {
-    "sunny": "\ue81a",          # wb_sunny
-    "partly_cloudy": "\uf172",  # partly_cloudy_day
-    "cloudy": "\ue2bd",         # cloud
-    "rain": "\uf176",           # rainy
-    "snow": "\ue2cd",           # ac_unit (snowflake)
-    "thunder": "\uebdb",        # thunderstorm
+    "thunder": "\uec1c",        # electric_bolt
+}
+
+# Bootstrap Icons 코드포인트
+_BI_ICON_CHARS = {
+    "sunny": chr(62882),        # sun
+    "partly_cloudy": chr(62142),  # cloud-sun
+    "cloudy": chr(62147),       # clouds
+    "rain": chr(62973),         # umbrella
+    "snow": chr(62830),         # snow2
 }
 
 # 아이콘별 색상
@@ -39,10 +54,15 @@ _ICON_COLORS = {
 }
 
 
-def _render_material(condition: str) -> Image.Image:
-    """Material Symbols 아이콘을 16x16 RGBA로 렌더링."""
-    font = _get_font()
-    char = _ICON_CHARS.get(condition, _ICON_CHARS["sunny"])
+def _render_icon(condition: str) -> Image.Image:
+    """아이콘을 RGBA로 렌더링 (폰트 자동 선택)."""
+    if condition in _ICON_CHARS:
+        font = _get_font()
+        char = _ICON_CHARS[condition]
+    else:
+        font = _get_bi_font()
+        char = _BI_ICON_CHARS.get(condition, _BI_ICON_CHARS["sunny"])
+
     color = _ICON_COLORS.get(condition, (220, 220, 240, 255))
 
     img = Image.new("RGBA", (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
@@ -60,12 +80,12 @@ def _render_material(condition: str) -> Image.Image:
 
 # 날씨 코드 → 아이콘 매핑 (기존 인터페이스 유지)
 WEATHER_ICONS = {
-    "sunny": lambda: _render_material("sunny"),
-    "cloudy": lambda: _render_material("cloudy"),
-    "partly_cloudy": lambda: _render_material("partly_cloudy"),
-    "rain": lambda: _render_material("rain"),
-    "snow": lambda: _render_material("snow"),
-    "thunder": lambda: _render_material("thunder"),
+    "sunny": lambda: _render_icon("sunny"),
+    "cloudy": lambda: _render_icon("cloudy"),
+    "partly_cloudy": lambda: _render_icon("partly_cloudy"),
+    "rain": lambda: _render_icon("rain"),
+    "snow": lambda: _render_icon("snow"),
+    "thunder": lambda: _render_icon("thunder"),
 }
 
 

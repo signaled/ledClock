@@ -16,7 +16,7 @@ from renderer.layout import Layout
 from content.clock import ClockContent
 from content.weather import WeatherProvider, WeatherData
 from content.weather_icons import get_weather_icon
-from content.background import BackgroundManager
+from content.background import BackgroundManager, DynamicBackground
 from scheduler import Scheduler
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
@@ -37,6 +37,7 @@ async def main():
         bg_dir=config["background"].get("directory", "assets/backgrounds/"),
         brightness=1.0,
     )
+    dynamic_bg = DynamicBackground()
     compositor = LayerCompositor()
     layout = Layout()
     scheduler = Scheduler(
@@ -96,8 +97,13 @@ async def main():
             if scheduler.should_update_background():
                 bg = bg_mgr.next()
 
-            # 배경 애니메이션 프레임
-            bg_frame = bg_mgr.get_frame()
+            # 배경 프레임: 파일 배경이 있으면 그것 사용, 없으면 동적 배경
+            if bg_mgr.has_backgrounds():
+                bg_frame = bg_mgr.get_frame()
+            else:
+                bg_frame = dynamic_bg.get_frame(
+                    now.hour, now.minute, weather.condition,
+                )
 
             # 매초 1회만 갱신하는 요소
             if cur_second != last_second:
