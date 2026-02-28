@@ -14,7 +14,7 @@ from renderer.text import render_text
 from renderer.layers import LayerCompositor
 from renderer.layout import Layout
 from content.clock import ClockContent
-from content.weather import WeatherProvider, WeatherData
+from content.weather import create_weather_provider, WeatherData
 from content.weather_icons import get_weather_icon
 from content.background import BackgroundManager, DynamicBackground
 from scheduler import Scheduler
@@ -28,11 +28,7 @@ async def main():
 
     # 모듈 초기화
     clock = ClockContent()
-    weather_prov = WeatherProvider(
-        lat=config["weather"].get("lat", 37.5665),
-        lon=config["weather"].get("lon", 126.9780),
-        cache_min=config["weather"].get("update_interval_min", 30),
-    )
+    weather_prov = create_weather_provider(config["weather"])
     bg_mgr = BackgroundManager(
         bg_dir=config["background"].get("directory", "assets/backgrounds/"),
         brightness=1.0,

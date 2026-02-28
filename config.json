@@ -14,9 +14,12 @@
     "date_format": "MM/DD (ddd)"
   },
   "weather": {
-    "api_provider": "open-meteo",
-    "lat": 37.5665,
-    "lon": 126.9780,
+    "api_provider": "kma",
+    "service_key": "f8a37addd903d4f7ead4647f3ec791cd3f5bce087b99e3832b5a2b717e97ecd0",
+    "nx": 58,
+    "ny": 125,
+    "lat": 37.4786,
+    "lon": 126.8666,
     "update_interval_min": 30
   },
   "background": {
