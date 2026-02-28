@@ -122,7 +122,7 @@ class ClockContent:
         if hour == 0:
             hour = 12
         sep = ":" if show_colon else " "
-        return render_text(f"{hour:02d}{sep}{now.minute:02d}", font_size=12, bold=True)
+        return render_text(f"{hour:02d}{sep}{now.minute:02d}", font_size=12, bold=True, monospace=True)
 
     def render_date(self, now: datetime) -> Image.Image:
         """날짜+요일 텍스트 이미지 (혼합 폰트, 요일 색상 적용)."""

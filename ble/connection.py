@@ -7,7 +7,7 @@ from bleak import BleakScanner
 logger = logging.getLogger(__name__)
 
 
-async def scan_devices(name_prefix: str = "IDM-", timeout: float = 10.0) -> list:
+async def scan_devices(name_prefix: str = "IDM-", timeout: float = 20.0) -> list:
     """BLE 디바이스를 스캔하여 이름 접두사가 일치하는 디바이스 목록을 반환한다.
 
     LED_BLE_ 접두사도 함께 검색한다.

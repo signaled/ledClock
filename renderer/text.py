@@ -52,6 +52,7 @@ def render_text(
     style: str | None = None,
     shadow: bool = True,
     shadow_color: tuple = (0, 0, 0, 255),
+    monospace: bool = False,
 ) -> Image.Image:
     """텍스트를 투명 배경의 RGBA 이미지로 렌더링한다.
 
@@ -59,8 +60,13 @@ def render_text(
 
     Args:
         style: 폰트 스타일 ("regular", "bold", "small", "large", "tiny")
+        monospace: True면 모든 문자를 동일 폭 셀에 중앙 배치
     """
     font = _get_font(font_size, bold, style)
+
+    if monospace:
+        return _render_monospace(text, font, color, shadow, shadow_color)
+
     bbox = font.getbbox(text)
     w = bbox[2] - bbox[0] + 2
     h = bbox[3] - bbox[1] + 2
@@ -86,6 +92,72 @@ def render_text(
     text_rgba = Image.new("RGBA", (w, h), color)
     text_layer.paste(text_rgba, (0, 0), mask)
     img = Image.alpha_composite(img, text_layer)
+
+    return img
+
+
+def _render_monospace(
+    text: str,
+    font: ImageFont.FreeTypeFont,
+    color: tuple,
+    shadow: bool,
+    shadow_color: tuple,
+) -> Image.Image:
+    """숫자만 동일 폭 셀에 중앙 배치, 나머지는 원래 폭으로 렌더링한다."""
+    # 숫자 중 가장 넓은 글자 기준으로 셀 폭 결정
+    digit_w = 0
+    min_top = 999
+    max_bottom = 0
+    glyphs = []
+    for ch in text:
+        bbox = font.getbbox(ch)
+        gw = bbox[2] - bbox[0]
+        gh = bbox[3] - bbox[1]
+        is_digit = ch.isdigit()
+        if is_digit and gw > digit_w:
+            digit_w = gw
+        if bbox[1] < min_top:
+            min_top = bbox[1]
+        if bbox[3] > max_bottom:
+            max_bottom = bbox[3]
+        glyphs.append((ch, bbox, gw, gh, is_digit))
+
+    digit_cell = digit_w + 1  # 숫자 셀 폭 (여백 포함)
+    # 전체 폭 계산: 숫자는 고정폭, 나머지는 원래 폭 + 1
+    total_w = 0
+    for ch, bbox, gw, gh, is_digit in glyphs:
+        total_w += digit_cell if is_digit else gw + 1
+
+    total_h = max_bottom - min_top + 2
+    sw = total_w + (1 if shadow else 0)
+    sh = total_h + (1 if shadow else 0)
+    img = Image.new("RGBA", (sw, sh), (0, 0, 0, 0))
+
+    x = 0
+    for ch, bbox, gw, gh, is_digit in glyphs:
+        if is_digit:
+            cx = x + (digit_cell - gw) // 2  # 셀 내 중앙
+            advance = digit_cell
+        else:
+            cx = x
+            advance = gw + 1
+
+        # 공통 기준선 기반 y 좌표
+        cy = bbox[1] - min_top + 1
+
+        mask = Image.new("L", (gw + 1, gh + 1), 0)
+        d = ImageDraw.Draw(mask)
+        d.fontmode = "1"
+        d.text((-bbox[0], -bbox[1]), ch, font=font, fill=255)
+
+        if shadow:
+            sc = Image.new("RGBA", mask.size, shadow_color)
+            for sx, sy in [(1, 0), (0, 1), (1, 1)]:
+                img.paste(sc, (cx + sx, cy + sy), mask)
+
+        cc = Image.new("RGBA", mask.size, color)
+        img.paste(cc, (cx, cy), mask)
+        x += advance
 
     return img
 

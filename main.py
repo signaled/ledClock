@@ -114,8 +114,8 @@ async def main():
             if cached_condition != weather.condition:
                 cached_condition = weather.condition
                 cached_icon = get_weather_icon(weather.condition)
-                cur_img = render_text(f"{weather.temp:.0f}° ", font_size=7, style="tiny", color=(255, 200, 100, 255))
-                mm_img = render_text(f"{weather.temp_min:.0f}°/{weather.temp_max:.0f}°", font_size=7, style="tiny", color=(190, 190, 200, 255))
+                cur_img = render_text(f"{weather.temp:.0f}° ", font_size=8, style="tiny", color=(255, 200, 100, 255))
+                mm_img = render_text(f"{weather.temp_min:.0f}°/{weather.temp_max:.0f}°", font_size=8, style="tiny", color=(190, 190, 200, 255))
                 cached_temp_img = Image.new("RGBA", (cur_img.width + mm_img.width, max(cur_img.height, mm_img.height)), (0, 0, 0, 0))
                 cached_temp_img.paste(cur_img, (0, 0), cur_img)
                 cached_temp_img.paste(mm_img, (cur_img.width, 0), mm_img)
