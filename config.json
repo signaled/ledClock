@@ -1,0 +1,25 @@
+{
+  "ble": {
+    "device_name_prefix": "IDM-",
+    "reconnect_interval_sec": 10
+  },
+  "display": {
+    "brightness": 50,
+    "orientation": 0
+  },
+  "clock": {
+    "format_24h": true,
+    "show_seconds": false,
+    "date_format": "MM/DD (ddd)"
+  },
+  "weather": {
+    "api_provider": "open-meteo",
+    "lat": 37.5665,
+    "lon": 126.9780,
+    "update_interval_min": 30
+  },
+  "background": {
+    "directory": "assets/backgrounds/",
+    "rotation_interval_min": 1
+  }
+}
