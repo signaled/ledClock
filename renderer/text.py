@@ -18,9 +18,30 @@ _FONTS = {
     "micro": _FONT_DIR / "Tiny5.ttf",
 }
 
-# 맑은 고딕 폴백
-_FALLBACK_FONT = "C:/Windows/Fonts/malgun.ttf"
-_FALLBACK_BOLD = "C:/Windows/Fonts/malgunbd.ttf"
+# 시스템 폴백 폰트 (OS별)
+import sys as _sys
+
+def _find_fallback(bold: bool = False) -> str:
+    """OS에 맞는 폴백 폰트 경로를 반환한다."""
+    candidates = []
+    if _sys.platform == "win32":
+        candidates = ["C:/Windows/Fonts/malgunbd.ttf" if bold else "C:/Windows/Fonts/malgun.ttf"]
+    elif _sys.platform == "darwin":
+        candidates = ["/System/Library/Fonts/AppleSDGothicNeo.ttc"]
+    else:
+        # Linux / Raspberry Pi
+        candidates = [
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc" if bold else "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc" if bold else "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        ]
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return ""
+
+_FALLBACK_FONT = _find_fallback(bold=False)
+_FALLBACK_BOLD = _find_fallback(bold=True)
 
 # 폰트 캐시
 _font_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
